@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeLab – Zukunftstag</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Nunito:wght@400;700;800&family=Playfair+Display:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+  <!-- ================= START ================= -->
+  <section id="start" class="start">
+    <div class="start-karte">
+      <div class="marke"><span class="marke-logo">&lt;/&gt;</span> CodeLab</div>
+      <h1>Programmier deine eigene Webseite</h1>
+      <p class="start-text">Du startest mit einer langweiligen Seite. Mit jedem Stück Code, das du einfügst, wird sie schöner – bis sie aussieht wie eine echte, moderne Webseite.</p>
+
+      <form id="neu-form">
+        <label class="label" for="neu-name">Wie heißt du?</label>
+        <input id="neu-name" class="eingabe eingabe-gross" type="text" maxlength="20" placeholder="Dein Vorname" autocomplete="off">
+
+        <span class="label">Such dir ein Bild aus</span>
+        <div id="neu-emojis" class="emoji-wahl"></div>
+
+        <button type="submit" class="btn btn-primaer btn-gross btn-voll">Los geht's →</button>
+      </form>
+
+      <div id="profile" class="profile" hidden>
+        <span class="label">Weitermachen</span>
+        <div id="profil-liste" class="profil-liste"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LABOR ================= -->
+  <section id="labor" class="labor" hidden>
+    <header class="topbar">
+      <div class="marke"><span class="marke-logo">&lt;/&gt;</span> CodeLab</div>
+      <div class="fortschritt">
+        <div class="fortschritt-balken"><div id="fortschritt-fuell"></div></div>
+        <span id="fortschritt-text">0 von 10</span>
+      </div>
+      <div class="topbar-rechts">
+        <button id="btn-infos" class="btn btn-leise">✏️ Meine Infos</button>
+        <button id="btn-download" class="btn btn-leise">⬇ Herunterladen</button>
+        <button id="btn-wechseln" class="btn btn-leise" title="Abmelden"><span id="topbar-emoji">🙂</span> <span id="topbar-name"></span></button>
+      </div>
+    </header>
+
+    <div class="arbeitsbereich">
+      <!-- Links: Schritte & Designs -->
+      <aside class="seitenleiste">
+        <nav id="schritt-punkte" class="schritt-punkte"></nav>
+
+        <div class="schritt">
+          <div class="schritt-kopf">
+            <span id="schritt-icon" class="schritt-icon"></span>
+            <div>
+              <div id="schritt-nummer" class="schritt-nummer"></div>
+              <h2 id="schritt-titel"></h2>
+            </div>
+            <span id="schritt-status" class="schritt-status"></span>
+          </div>
+          <p id="schritt-text" class="schritt-text"></p>
+
+          <span class="label">1. Wähle ein Design</span>
+          <div id="varianten" class="varianten"></div>
+
+          <div class="code-kopf">
+            <span class="label">2. Kopiere diesen Code</span>
+            <button id="btn-kopieren" class="btn btn-primaer btn-klein">📋 Kopieren</button>
+          </div>
+          <pre id="vorlage" class="vorlage"></pre>
+
+          <p class="hinweis">3. Klick unten ins Feld <b>„Dein Code“</b> – ganz ans Ende – und füge ihn ein mit <kbd id="kbd-taste">Strg</kbd> + <kbd>V</kbd></p>
+
+          <div id="schritt-tipp" class="tipp"></div>
+
+          <div class="schritt-nav">
+            <button id="btn-zurueck" class="btn btn-rand">← Zurück</button>
+            <button id="btn-weiter" class="btn btn-primaer">Weiter →</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Rechts: Vorschau & Code -->
+      <main class="haupt">
+        <div class="vorschau">
+          <div class="fenster-leiste">
+            <span class="punkte"><i></i><i></i><i></i></span>
+            <span id="adresse" class="adresse">meine-seite.de</span>
+            <button id="btn-vollbild" class="btn btn-leise btn-klein">⤢ Groß anschauen</button>
+          </div>
+          <iframe id="vorschau" title="Vorschau deiner Seite"></iframe>
+        </div>
+
+        <div class="editor">
+          <div class="editor-leiste">
+            <span class="datei">🎨 Dein Code <small>style.css</small></span>
+            <span id="code-status" class="code-status ok">✓ Alles richtig</span>
+            <button id="btn-leeren" class="btn btn-dunkel btn-klein">Alles löschen</button>
+          </div>
+          <div class="code-editor">
+            <div id="zeilen" class="zeilen"></div>
+            <div class="code-feld">
+              <pre id="code-farbig" class="code-farbig" aria-hidden="true"></pre>
+              <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Füge hier deinen Code ein …"></textarea>
+            </div>
+          </div>
+          <div id="fehler-liste" class="fehler-liste" hidden></div>
+        </div>
+      </main>
+    </div>
+
+    <button id="btn-vollbild-zu" class="btn btn-primaer btn-gross vollbild-zu" hidden>← Zurück zum Code</button>
+  </section>
+
+  <!-- ================= Infos-Fenster ================= -->
+  <div id="infos-fenster" class="dialog" hidden>
+    <form id="infos-form" class="dialog-box">
+      <h2>✏️ Meine Infos</h2>
+      <p class="dialog-text">Das steht auf deiner Seite. Den Text kannst du ändern, wie du willst.</p>
+      <label class="label" for="info-name">Name</label>
+      <input id="info-name" class="eingabe" maxlength="20">
+      <label class="label" for="info-intro">Über mich</label>
+      <textarea id="info-intro" class="eingabe" rows="2" maxlength="140"></textarea>
+      <div id="info-karten"></div>
+      <div class="dialog-knoepfe">
+        <button type="button" id="infos-abbrechen" class="btn btn-rand">Abbrechen</button>
+        <button type="submit" class="btn btn-primaer">Speichern</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ================= Fertig-Fenster ================= -->
+  <div id="fertig-fenster" class="dialog" hidden>
+    <div class="dialog-box dialog-mitte">
+      <div class="pokal">🏆</div>
+      <h2>Du hast es geschafft!</h2>
+      <p class="dialog-text">Deine Seite ist fertig – und du hast jede Zeile Code selbst eingefügt. Das ist echtes Webdesign!</p>
+      <div class="dialog-knoepfe">
+        <button id="fertig-zu" class="btn btn-rand">Weiter basteln</button>
+        <button id="fertig-download" class="btn btn-primaer">⬇ Seite herunterladen</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="js/schritte.js"></script>
+  <script src="js/css-leser.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
