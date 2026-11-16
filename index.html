@@ -7,14 +7,44 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Nunito:wght@400;700;800&family=Playfair+Display:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=IBM+Plex+Mono:wght@400;500;600&family=Nunito:wght@400;700;800&family=Playfair+Display:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css">
 </head>
 <body>
 
+  <!-- ================= MODUSWAHL ================= -->
+  <section id="moduswahl" class="moduswahl">
+    <div class="modus-inhalt">
+      <div class="modus-marke"><span class="marke-logo">&lt;/&gt;</span> CodeLab <span class="modus-punkt">/</span> ZUKUNFTSTAG</div>
+      <p class="modus-kicker">Zwei Wege. Dein Code.</p>
+      <h1>Was möchtest du heute bauen?</h1>
+      <p class="modus-intro">Wähle deinen Workshop und leg direkt los.</p>
+      <div class="modus-karten">
+        <button id="wahl-zukunftstag" class="modus-karte modus-zukunft" type="button">
+          <span class="modus-symbol">✳</span>
+          <span class="modus-label">WORKSHOP 01 · EINSTIEG</span>
+          <strong>Zukunftstag</strong>
+          <span class="modus-beschreibung">Gestalte deine persönliche Webseite Schritt für Schritt mit CSS.</span>
+          <span class="modus-meta">10 Schritte <span>·</span> Mit Vorlagen <span>·</span> Für Einsteiger*innen</span>
+          <span class="modus-aktion">Workshop öffnen <span aria-hidden="true">↗</span></span>
+        </button>
+        <button id="wahl-triebwerk" class="modus-karte modus-triebwerk" type="button">
+          <img class="modus-bild" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Die Erde aus dem Weltraum" loading="eager">
+          <span class="modus-label">WORKSHOP 02 · CODE-CHALLENGE</span>
+          <strong>Triebwerk</strong>
+          <span class="modus-beschreibung">Baue eine Webseite für eine Weltraum-Mission – du schreibst den Code selbst.</span>
+          <span class="modus-meta">14 Aufgaben <span>·</span> ca. 40 Minuten <span>·</span> Extra-Missionen</span>
+          <span class="modus-aktion">Challenge starten <span aria-hidden="true">↗</span></span>
+        </button>
+      </div>
+      <div class="modus-fuss">CODELAB <span>—</span> PROGRAMMIEREN LERNEN DURCH MACHEN</div>
+    </div>
+  </section>
+
   <!-- ================= START ================= -->
-  <section id="start" class="start">
+  <section id="start" class="start" hidden>
     <div class="start-karte">
+      <button id="btn-start-modus" class="btn btn-leise start-modus" type="button">← Workshop wechseln</button>
       <div class="marke"><span class="marke-logo">&lt;/&gt;</span> CodeLab</div>
       <h1>Programmier deine eigene Webseite</h1>
       <p class="start-text">Du startest mit einer langweiligen Seite. Mit jedem Stück Code, das du einfügst, wird sie schöner – bis sie aussieht wie eine echte, moderne Webseite.</p>
@@ -36,6 +66,66 @@
     </div>
   </section>
 
+  <!-- ================= TRIEBWERK ================= -->
+  <section id="triebwerk" class="triebwerk" hidden>
+    <header class="tw-kopf">
+      <button id="tw-zur-moduswahl" class="tw-marke" type="button" title="Zur Workshop-Auswahl"><span class="tw-zurueck" aria-hidden="true">‹</span><span>Triebwerk <small>Mission Europa</small></span></button>
+      <div class="tw-kopf-mitte"><div class="tw-progress"><span id="tw-progress-fill"></span></div><span id="tw-progress-label">0 / 14</span></div>
+      <button id="tw-reset" class="tw-reset" type="button" title="Code zurücksetzen">Neu starten</button>
+    </header>
+    <div class="tw-workspace">
+      <aside class="tw-briefing">
+        <section class="tw-aufgabe">
+          <div class="tw-task-kopf"><span id="tw-task-chapter"></span><span id="tw-task-num"></span></div>
+          <h2 id="tw-task-title"></h2>
+          <p id="tw-task-text"></p>
+          <div class="tw-anleitung">
+            <div class="tw-anleitung-zeile"><span class="tw-anleitung-label">1 · Öffne</span><span id="tw-task-file" class="tw-file-chip"></span></div>
+            <div id="tw-find-row" class="tw-anleitung-zeile tw-anleitung-block"><span class="tw-anleitung-label">2 · Suche</span><code id="tw-task-find"></code></div>
+            <div class="tw-anleitung-zeile tw-anleitung-block"><span id="tw-example-label" class="tw-anleitung-label">3 · Ändere, z. B.</span><code id="tw-task-example"></code></div>
+          </div>
+          <button id="tw-locate" class="tw-locate" type="button">Stelle im Code zeigen</button>
+          <div class="tw-konzept"><span>Kurz erklärt</span><p id="tw-konzept-text"></p></div>
+          <button id="tw-hint-button" class="tw-hint-button" type="button" aria-expanded="false">Tipp anzeigen <span>＋</span></button>
+          <p id="tw-hint" class="tw-hint" hidden></p>
+          <div id="tw-check-message" class="tw-check-message" aria-live="polite"></div>
+          <button id="tw-check" class="tw-check" type="button">Aufgabe prüfen</button>
+        </section>
+        <section id="tw-bonus" class="tw-bonus" hidden>
+          <div class="tw-bonus-head">Extra-Missionen für Schnelle</div>
+          <div id="tw-bonus-list"></div>
+        </section>
+        <div class="tw-steps-head">Alle Aufgaben</div>
+        <nav id="tw-steps" class="tw-steps" aria-label="Aufgaben"></nav>
+      </aside>
+      <main class="tw-studio">
+        <div class="tw-preview">
+          <div class="tw-panelbar">
+            <div class="tw-ampel"><i></i><i></i><i></i></div>
+            <span id="tw-preview-label">Vorschau</span>
+            <div class="tw-device" role="group" aria-label="Vorschaugröße">
+              <button id="tw-device-desktop" class="active" type="button" aria-pressed="true">Computer</button>
+              <button id="tw-device-phone" type="button" aria-pressed="false">Handy</button>
+            </div>
+          </div>
+          <div id="tw-preview-box" class="tw-preview-frame"><iframe id="tw-preview-frame" title="Live-Vorschau deiner Missions-Webseite" sandbox="allow-same-origin"></iframe><div id="tw-preview-empty" class="tw-preview-empty"><b>Deine Seite erscheint hier.</b><small>Schreib HTML und CSS, um die Vorschau zu bauen.</small></div></div>
+        </div>
+        <section class="tw-editor">
+          <div class="tw-tabs" role="tablist" aria-label="Code-Datei auswählen">
+            <button id="tw-tab-html" class="tw-tab active" type="button" role="tab" aria-selected="true" aria-controls="tw-html">index.html <small>Inhalt</small></button>
+            <button id="tw-tab-css" class="tw-tab" type="button" role="tab" aria-selected="false" aria-controls="tw-css">style.css <small>Aussehen</small></button>
+            <span id="tw-save-state">Gespeichert</span>
+            <button id="tw-format" class="tw-format" type="button" title="Aktuelle Datei automatisch ordentlich einrücken">Aufräumen</button>
+          </div>
+          <div class="tw-editors">
+            <div class="tw-editor-pane active" id="tw-pane-html"><textarea id="tw-html" aria-label="HTML-Code" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off"></textarea></div>
+            <div class="tw-editor-pane" id="tw-pane-css" hidden><textarea id="tw-css" aria-label="CSS-Code" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" placeholder="Dein CSS beginnt hier …"></textarea></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </section>
+
   <!-- ================= LABOR ================= -->
   <section id="labor" class="labor" hidden>
     <header class="topbar">
@@ -47,7 +137,7 @@
       <div class="topbar-rechts">
         <button id="btn-infos" class="btn btn-leise">✏️ Meine Infos</button>
         <button id="btn-download" class="btn btn-leise">⬇ Herunterladen</button>
-        <button id="btn-wechseln" class="btn btn-leise" title="Abmelden"><span id="topbar-emoji">🙂</span> <span id="topbar-name"></span></button>
+        <button id="btn-wechseln" class="btn btn-leise" title="Workshop wechseln"><span id="topbar-emoji">🙂</span> <span id="topbar-name"></span></button>
       </div>
     </header>
 
@@ -153,6 +243,7 @@
 
   <script src="schritte.js"></script>
   <script src="css-leser.js"></script>
+  <script src="triebwerk.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

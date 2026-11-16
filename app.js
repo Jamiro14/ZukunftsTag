@@ -43,6 +43,8 @@ function neuesKind(name, emoji) {
 
 function zeigeStart() {
   aktivId = null;
+  $('#moduswahl').hidden = true;
+  $('#triebwerk').hidden = true;
   $('#labor').hidden = true;
   $('#start').hidden = false;
 
@@ -403,7 +405,24 @@ $('#btn-vollbild-zu').onclick = () => { document.body.classList.remove('vollbild
 
 /* ---------------- Topbar ---------------- */
 
-$('#btn-wechseln').onclick = () => { speichern(); kinder = laden(); zeigeStart(); };
+$('#btn-wechseln').onclick = () => { speichern(); kinder = laden(); zeigeModuswahl(); };
+
+function zeigeModuswahl() {
+  $('#moduswahl').hidden = false;
+  $('#start').hidden = true;
+  $('#labor').hidden = true;
+  $('#triebwerk').hidden = true;
+}
+
+$('#wahl-zukunftstag').onclick = zeigeStart;
+$('#wahl-triebwerk').onclick = () => {
+  $('#moduswahl').hidden = true;
+  $('#start').hidden = true;
+  $('#labor').hidden = true;
+  $('#triebwerk').hidden = false;
+  window.dispatchEvent(new Event('triebwerk-open'));
+};
+$('#btn-start-modus').onclick = zeigeModuswahl;
 
 function herunterladen() {
   const a = document.createElement('a');
@@ -456,4 +475,4 @@ function zeigeToast(text) {
 }
 
 /* ---------------- Los ---------------- */
-zeigeStart();
+zeigeModuswahl();
