@@ -598,7 +598,193 @@ h1 {
     return `<!doctype html>\n${formatNode(parsed.documentElement, 0).join('\n')}`;
   }
 
+  function escapeCode(source) {
+    return source.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function syntaxSpan(type, source) {
+    return `<span class="tw-syntax-${type}">${escapeCode(source)}</span>`;
+  }
+
+  function highlightHtmlTag(source) {
+    const opening = source.match(/^<(\/?)([A-Za-z][\w:-]*)/);
+    if (!opening) return escapeCode(source);
+
+    let result = syntaxSpan('punctuation', `<${opening[1]}`) + syntaxSpan('tag', opening[2]);
+    let index = opening[0].length;
+    while (index < source.length) {
+      const character = source[index];
+      if (/\s/.test(character)) {
+        let end = index + 1;
+        while (end < source.length && /\s/.test(source[end])) end += 1;
+        result += escapeCode(source.slice(index, end));
+        index = end;
+      } else if (character === '>') {
+        result += syntaxSpan('punctuation', character);
+        index += 1;
+      } else if (character === '/' || character === '=') {
+        result += syntaxSpan('punctuation', character);
+        index += 1;
+      } else {
+        const attribute = source.slice(index).match(/^[^\s=/>]+/);
+        if (!attribute) {
+          result += escapeCode(character);
+          index += 1;
+          continue;
+        }
+        result += syntaxSpan('attribute', attribute[0]);
+        index += attribute[0].length;
+        while (/\s/.test(source[index] || '') && index < source.length) {
+          result += escapeCode(source[index]);
+          index += 1;
+        }
+        if (source[index] === '=') {
+          result += syntaxSpan('punctuation', '=');
+          index += 1;
+          while (/\s/.test(source[index] || '') && index < source.length) {
+            result += escapeCode(source[index]);
+            index += 1;
+          }
+          const quote = source[index];
+          if (quote === '"' || quote === "'") {
+            let end = index + 1;
+            while (end < source.length && source[end] !== quote) end += 1;
+            if (end < source.length) end += 1;
+            result += syntaxSpan('string', source.slice(index, end));
+            index = end;
+          } else {
+            const value = source.slice(index).match(/^[^\s>]+/);
+            if (value) {
+              result += syntaxSpan('string', value[0]);
+              index += value[0].length;
+            }
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  function highlightHtml(source) {
+    let result = '';
+    let index = 0;
+    while (index < source.length) {
+      const start = source.indexOf('<', index);
+      if (start < 0) return result + escapeCode(source.slice(index));
+      result += escapeCode(source.slice(index, start));
+
+      if (source.startsWith('<!--', start)) {
+        const close = source.indexOf('-->', start + 4);
+        const end = close < 0 ? source.length : close + 3;
+        result += syntaxSpan('comment', source.slice(start, end));
+        index = end;
+        continue;
+      }
+
+      const doctype = source.slice(start).match(/^<!doctype\b[^>]*>/i);
+      if (doctype) {
+        result += syntaxSpan('doctype', doctype[0]);
+        index = start + doctype[0].length;
+        continue;
+      }
+
+      if (!/^<\/?[A-Za-z]/.test(source.slice(start))) {
+        result += '&lt;';
+        index = start + 1;
+        continue;
+      }
+
+      let quote = '';
+      let end = start + 1;
+      for (; end < source.length; end += 1) {
+        const character = source[end];
+        if (quote) {
+          if (character === quote) quote = '';
+        } else if (character === '"' || character === "'") {
+          quote = character;
+        } else if (character === '>') {
+          end += 1;
+          break;
+        }
+      }
+      const tag = source.slice(start, end);
+      result += highlightHtmlTag(tag);
+      index = end;
+    }
+    return result;
+  }
+
+  function highlightCss(source) {
+    const tokens = /\/\*[\s\S]*?\*\/|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|@[a-z_-][\w-]*|#[\da-fA-F]{3,8}\b|[+-]?(?:\d*\.)?\d+(?:%|[a-zA-Z]+)?|[{}:;,()]|--?[\w-]+|[a-zA-Z_][\w-]*|\s+|./gy;
+    const blocks = [];
+    let inValue = false;
+    let prelude = '';
+    let result = '';
+    let match;
+
+    while ((match = tokens.exec(source))) {
+      const token = match[0];
+      const next = source.slice(tokens.lastIndex).match(/^\s*(.)/);
+      if (token.startsWith('/*')) {
+        result += syntaxSpan('comment', token);
+      } else if (token[0] === '"' || token[0] === "'") {
+        result += syntaxSpan('string', token);
+        if (!blocks.length || blocks[blocks.length - 1] === false) prelude += token;
+      } else if (token[0] === '@') {
+        result += syntaxSpan('at-rule', token);
+        prelude += token;
+      } else if (/^#[\da-fA-F]{3,8}$/i.test(token)) {
+        result += syntaxSpan('color', token);
+      } else if (/^[+-]?(?:\d*\.)?\d/.test(token)) {
+        result += syntaxSpan('number', token);
+      } else if (token === '{') {
+        result += syntaxSpan('punctuation', token);
+        blocks.push(!prelude.trim().startsWith('@'));
+        prelude = '';
+        inValue = false;
+      } else if (token === '}') {
+        result += syntaxSpan('punctuation', token);
+        blocks.pop();
+        prelude = '';
+        inValue = false;
+      } else if (token === ':') {
+        result += syntaxSpan('punctuation', token);
+        if (blocks[blocks.length - 1]) inValue = true;
+        else prelude += token;
+      } else if (token === ';') {
+        result += syntaxSpan('punctuation', token);
+        inValue = false;
+        prelude = '';
+      } else if (/^[a-zA-Z_-]/.test(token) && !/^\s/.test(token)) {
+        if (blocks[blocks.length - 1]) {
+          const type = inValue ? (next?.[1] === '(' ? 'function' : 'value') : 'property';
+          result += syntaxSpan(type, token);
+        } else {
+          result += syntaxSpan('selector', token);
+          prelude += token;
+        }
+      } else {
+        result += escapeCode(token);
+        if (!blocks.length || blocks[blocks.length - 1] === false) prelude += token;
+      }
+    }
+    return result;
+  }
+
+  function updateHighlight(field) {
+    const output = field === htmlField ? $('#tw-html-highlight') : $('#tw-css-highlight');
+    output.innerHTML = `${field === htmlField ? highlightHtml(field.value) : highlightCss(field.value)}\n `;
+    output.scrollTop = field.scrollTop;
+    output.scrollLeft = field.scrollLeft;
+  }
+
   [htmlField, cssField].forEach((field) => {
+    field.addEventListener('input', () => updateHighlight(field));
+    field.addEventListener('scroll', () => {
+      const output = field === htmlField ? $('#tw-html-highlight') : $('#tw-css-highlight');
+      output.scrollTop = field.scrollTop;
+      output.scrollLeft = field.scrollLeft;
+    });
     field.addEventListener('input', scheduleUpdate);
     field.addEventListener('keydown', (event) => {
       if (event.key !== 'Tab') return;
@@ -678,6 +864,8 @@ h1 {
     activeBonus = -1;
     htmlField.value = state.html;
     cssField.value = state.css;
+    updateHighlight(htmlField);
+    updateHighlight(cssField);
     switchTab('html');
     update();
     renderTask();
@@ -689,6 +877,8 @@ h1 {
 
   htmlField.value = state.html;
   cssField.value = state.css;
+  updateHighlight(htmlField);
+  updateHighlight(cssField);
   switchTab(state.tab);
   renderTask();
   renderProgress();
